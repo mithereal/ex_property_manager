@@ -3,9 +3,9 @@ defmodule FrameworkWeb.ImagePlugCache do
   import Plug.Conn
 
   plug PlugCacheControl,
-       directives:
-         [:public] ++
-         Application.compile_env!(:framework, [:image_plug_cache])
+    directives:
+      [:public] ++
+        Application.compile_env!(:framework, [:image_plug_cache])
 
   plug :check_hmac
   plug :build_image
@@ -98,11 +98,11 @@ defmodule FrameworkWeb.ImagePlugCache do
 
     image
     |> Image.stream!(
-         suffix: ".jpg",
-         buffer_size: 5_242_880,
-         progressive: true,
-         quality: opts.quality
-       )
+      suffix: ".jpg",
+      buffer_size: 5_242_880,
+      progressive: true,
+      quality: opts.quality
+    )
     |> Enum.reduce_while(conn, fn chunk, conn ->
       case chunk(conn, chunk) do
         {:ok, conn} -> {:cont, conn}

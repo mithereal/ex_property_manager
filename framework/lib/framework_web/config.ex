@@ -66,5 +66,4 @@ defmodule FrameworkWeb.Config do
   def site_title_prefix(default \\ "") do
     Application.get_env(:framework, :site_title_prefix, default)
   end
-
 end

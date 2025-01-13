@@ -1,10 +1,10 @@
 import Config
 
 config :phoenix_copy,
-       framework: [
-         source: Path.expand("../assets/static/", __DIR__),
-         destination: Path.expand("../priv/static/", __DIR__)
-       ]
+  framework: [
+    source: Path.expand("../assets/static/", __DIR__),
+    destination: Path.expand("../priv/static/", __DIR__)
+  ]
 
 # Configure your database
 config :framework, Framework.Repo,
@@ -90,4 +90,3 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
-

@@ -18,15 +18,15 @@ config :mime, :types, %{
   "application/jrd+json" => ["jrd"]
 }
 
-#config :framework, :image_plug_cache,
+# config :framework, :image_plug_cache,
 #       max_age: {24, :hour},
 #       stale_while_revalidate: {12, :hour}
 
 config :ueberauth, Ueberauth, providers: [google: {Ueberauth.Strategy.Google, []}]
 
 config :ueberauth, Ueberauth.Strategy.Google.OAuth,
-       client_id: System.get_env("GOOGLE_CLIENT_ID"),
-       client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
 
 # Configures the endpoint
 config :framework, FrameworkWeb.Endpoint,
@@ -79,19 +79,19 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :framework, Oban,
-       repo: Framework.Repo,
-       plugins: [
-         Oban.Plugins.Pruner,
-         {Oban.Plugins.Cron,
-           crontab: [
-             {"0 * * * *", Framework.Workers.Hourly}
-           ]}
-       ],
-       queues: [default: 10, system: 50]
+  repo: Framework.Repo,
+  plugins: [
+    Oban.Plugins.Pruner,
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"0 * * * *", Framework.Workers.Hourly}
+     ]}
+  ],
+  queues: [default: 10, system: 50]
 
 config :framework, :image_plug_cache,
-       max_age: {24, :hour},
-       stale_while_revalidate: {12, :hour}
+  max_age: {24, :hour},
+  stale_while_revalidate: {12, :hour}
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

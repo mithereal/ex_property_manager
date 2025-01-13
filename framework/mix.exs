@@ -61,6 +61,7 @@ defmodule Framework.MixProject do
       {:bandit, "~> 1.5"},
       {:distillery, "~> 2.1"},
       {:oban, "~> 2.17.0"},
+      {:bcrypt_elixir, "~> 2.0"},
       {:ecto_soft_delete, ">= 0.0.0"},
       {:ecto_autoslug_field, "~> 3.0"},
       {:image, "~> 0.54.1"},
@@ -78,7 +79,7 @@ defmodule Framework.MixProject do
       {:phoenix_seo, "~> 0.1.8"},
       {:phoenix_copy, ">= 0.0.0"},
       {:etag_plug, "~> 1.0"},
-      {:plug_cache_control, "~> 1.1.0", github: "tanguilp/plug_cache_control"},
+      {:plug_cache_control, "~> 1.1.0", github: "tanguilp/plug_cache_control"}
     ]
   end
 
@@ -90,6 +91,8 @@ defmodule Framework.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
+      diagram: ["cmd bash ../docker/generate_diagram.sh"],
+      reset: ["deps.get", "ecto.drop", "ecto.setup", "assets.setup", "assets.build"],
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],

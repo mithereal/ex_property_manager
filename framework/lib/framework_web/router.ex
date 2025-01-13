@@ -1,6 +1,11 @@
 defmodule FrameworkWeb.Router do
   use FrameworkWeb, :router
 
+  import FrameworkWeb.UserAuth
+
+  alias FrameworkWeb, as: Web
+  alias FrameworkWeb.Theme.Handler, as: ThemeHandler
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -10,14 +15,41 @@ defmodule FrameworkWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :webfinger do
+    plug :accepts, ["jrd", "json"]
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/", FrameworkWeb do
+  pipeline :robots do
+    plug :accepts, ~w[html json txt xml webmanifest]
+  end
+
+  scope "/", Web do
     pipe_through :browser
 
     get "/", PageController, :landing
+  end
+
+  scope "/", Web do
+    pipe_through :webfinger
+
+    get "/.well-known/webfinger", FingerController, :finger
+  end
+
+  scope "/oauth", Web do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/callbacks/:provider", OAuthCallbackController, :new
+  end
+
+  scope "/aws", Web do
+    pipe_through :api
+
+    get "/", ApiController, :list_objects
+    forward "/", ImagePlug, secret: &Framework.thumbor_secret/0
   end
 
   # Other scopes may use custom stacks.
