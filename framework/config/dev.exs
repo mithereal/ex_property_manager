@@ -1,5 +1,11 @@
 import Config
 
+config :phoenix_copy,
+       framework: [
+         source: Path.expand("../assets/static/", __DIR__),
+         destination: Path.expand("../priv/static/", __DIR__)
+       ]
+
 # Configure your database
 config :framework, Framework.Repo,
   username: "postgres",
@@ -25,6 +31,7 @@ config :framework, FrameworkWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "tWtsjqdpRceYk4iSAM5NMjAEvFXQdldhf+2njEp6+0iAwXzJ5O+xpErYOBcrl3yr",
   watchers: [
+    asset_copy: {Phoenix.Copy, :watch, [:framework]},
     esbuild: {Esbuild, :install_and_run, [:framework, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:framework, ~w(--watch)]}
   ]
@@ -83,3 +90,4 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+

@@ -35,3 +35,15 @@ framework-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/priv/static/images/
+/priv/static/js/
+/priv/static/svg/
+/priv/static/images/
+/priv/static/svg/
+/priv/static/js/
+/priv/static/css/
+/priv/static/fonts/
+/priv/static/service_worker.js
+/priv/static/favicon.ico
+/priv/static/pwa.json
+/priv/static/images/

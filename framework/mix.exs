@@ -72,7 +72,13 @@ defmodule Framework.MixProject do
       {:flop_phoenix, "~> 0.23.1"},
       {:req, "~> 0.5.6"},
       {:req_s3, "~> 0.2.3"},
-      {:timex, "~> 3.0"}
+      {:timex, "~> 3.0"},
+      #
+      {:adept_svg, "~> 0.3.1"},
+      {:phoenix_seo, "~> 0.1.8"},
+      {:phoenix_copy, ">= 0.0.0"},
+      {:etag_plug, "~> 1.0"},
+      {:plug_cache_control, "~> 1.1.0", github: "tanguilp/plug_cache_control"},
     ]
   end
 
