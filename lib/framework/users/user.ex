@@ -45,43 +45,39 @@ defmodule Framework.Users.User do
   also be very expensive to hash for certain algorithms.
   """
   def registration_changeset(schema, attrs) do
-    changeset =
-      schema
-      |> cast(attrs, [
-        :email,
-        :active,
-        :password,
-        :password_confirmation,
-        :terms,
-        :confirmed_at,
-        :last_login,
-        :username
-      ])
-      |> validate_email()
-      |> validate_password()
-      |> validate_required(:terms, message: "Do You Accept The Terms")
-      |> validate_required([:password_confirmation])
-      |> validate_confirmation(:password, message: "Passwords dont match")
-      |> create_username()
-      |> create_member()
-      |> create_account()
+    schema
+    |> cast(attrs, [
+      :email,
+      :active,
+      :password,
+      :password_confirmation,
+      :terms,
+      :confirmed_at,
+      :last_login,
+      :username
+    ])
+    |> validate_email()
+    |> validate_password()
+    |> validate_required(:terms, message: "Do You Accept The Terms")
+    |> validate_required([:password_confirmation])
+    |> validate_confirmation(:password, message: "Passwords dont match")
+    |> create_username()
   end
 
   def changeset(schema, attrs) do
-    changeset =
-      schema
-      |> cast(attrs, [
-        :email,
-        :password,
-        :username,
-        :terms,
-        :stripe_account_id,
-        :account_id,
-        :profile_id,
-        :membership_id
-      ])
-      |> validate_email()
-      |> validate_password()
+    schema
+    |> cast(attrs, [
+      :email,
+      :password,
+      :username,
+      :terms,
+      :stripe_account_id,
+      :account_id,
+      :profile_id,
+      :membership_id
+    ])
+    |> validate_email()
+    |> validate_password()
   end
 
   defp create_account(%{valid?: true} = changeset) do
@@ -90,14 +86,6 @@ defmodule Framework.Users.User do
 
     changeset
     |> put_change(:account_id, account.id)
-  end
-
-  defp create_role(changeset) do
-    %{changeset | valid?: false}
-  end
-
-  defp create_member(changeset) do
-    %{changeset | valid?: false}
   end
 
   defp create_account(changeset) do
@@ -184,7 +172,7 @@ defmodule Framework.Users.User do
     Bcrypt.verify_pass(password, hashed_password)
   end
 
-  def valid_password?(%User{hashed_password: hashed_password}, password)
+  def valid_password?(%User{hashed_password: hashed_password}, _password)
       when byte_size(hashed_password) < 1 do
     nil
   end

@@ -5,11 +5,7 @@ defmodule Framework.MediaLibrary do
 
   require Logger
   import Ecto.Query, warn: false
-  alias Framework.{Repo, Accounts}
   alias Framework.Images.Image
-  alias Ecto.{Multi, Changeset}
-
-  @pubsub Framework.PubSub
 
   def store_image(%Image{} = image, tmp_path) do
     File.mkdir_p!(Path.dirname(image.filepath))

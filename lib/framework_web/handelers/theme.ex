@@ -19,7 +19,7 @@ defmodule FrameworkWeb.Theme.Handler do
 
   # @before_compile {FrameworkWeb.Theme.Handler, :add_themes}
 
-  def current_user_theme(socket, params) do
+  def current_user_theme(socket, _params) do
     case Enum.member?(["current_user"], socket) do
       true ->
         socket.current_user.theme

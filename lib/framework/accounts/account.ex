@@ -4,6 +4,8 @@ defmodule Framework.Accounts.Account do
   @foreign_key_type :binary_id
   import Ecto.Changeset
 
+  alias Framework.Repo
+
   @derive {
     Flop.Schema,
     filterable: [:email, :active], sortable: [:email]

@@ -105,22 +105,21 @@ defmodule Framework.Images do
   end
 
   def select_image(params) do
-    image =
-      case params.event.image_id do
-        nil ->
-          case params.talent.image_id do
-            nil ->
-              case params.venue.image_id do
-                nil -> "/images/placeholder.png"
-                _ -> params.venue.image.link
-              end
+    case params.event.image_id do
+      nil ->
+        case params.talent.image_id do
+          nil ->
+            case params.venue.image_id do
+              nil -> "/images/placeholder.png"
+              _ -> params.venue.image.link
+            end
 
-            _ ->
-              params.talent.image.link
-          end
+          _ ->
+            params.talent.image.link
+        end
 
-        _ ->
-          params.event.image.link
-      end
+      _ ->
+        params.event.image.link
+    end
   end
 end

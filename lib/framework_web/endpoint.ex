@@ -15,6 +15,9 @@ defmodule FrameworkWeb.Endpoint do
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
 
+  plug :health
+  plug :router_url
+
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phx.digest
@@ -50,4 +53,26 @@ defmodule FrameworkWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug FrameworkWeb.Router
+
+  def health(conn, _) do
+    case conn do
+      %{request_path: "/health"} -> conn |> send_resp(200, "OK") |> halt()
+      _ -> conn
+    end
+  end
+
+  def router_url(conn, _) do
+    uri = %URI{struct_url() | host: conn.host, scheme: "#{conn.scheme}", port: conn.port}
+
+    conn
+    |> Phoenix.Controller.put_router_url(uri)
+    |> Phoenix.Controller.put_static_url(uri)
+  end
+
+  def static_headers(conn) do
+    case conn.request_path do
+      "/assets/serviceworker.js" -> [{"Service-Worker-Allowed", "/"}]
+      _ -> []
+    end
+  end
 end

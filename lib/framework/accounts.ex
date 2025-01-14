@@ -161,7 +161,7 @@ defmodule Framework.Accounts do
     # |> grant_role("user")
   end
 
-  defp validate_passwords(user) do
+  defp validate_passwords(_user) do
   end
 
   #  defp grant_role(user, role) do
@@ -189,7 +189,7 @@ defmodule Framework.Accounts do
   #    end
   #  end
 
-  defp maybe_grant(user, _) do
+  defp maybe_grant(_user, _) do
     {:ok, %{}}
   end
 
@@ -654,8 +654,8 @@ defmodule Framework.Accounts do
 
   def find_or_create(auth) do
     case get_user_by_email(auth.email) do
-      nil ->
-        user = register_user(auth)
+      {:ok, _} ->
+        register_user(auth)
 
       reply ->
         reply
@@ -664,5 +664,9 @@ defmodule Framework.Accounts do
 
   def register_google_user(primary, info, emails, token) do
     {primary, info, emails, token}
+  end
+
+  def admin?(user) do
+    false
   end
 end

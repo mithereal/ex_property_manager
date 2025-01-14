@@ -43,7 +43,7 @@ defmodule FrameworkWeb.AuthController do
         |> put_flash(:error, reason)
         |> redirect(to: "/")
 
-      :error ->
+      _ ->
         conn
         |> put_flash(:error, "No Configured Provider")
         |> redirect(to: "/")

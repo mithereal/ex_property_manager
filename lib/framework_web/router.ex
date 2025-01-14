@@ -3,6 +3,9 @@ defmodule FrameworkWeb.Router do
 
   import FrameworkWeb.UserAuth
 
+  import Redirect
+  import FrameworkWeb.Plugs
+
   alias FrameworkWeb, as: Web
   alias FrameworkWeb.Theme.Handler, as: ThemeHandler
 
@@ -45,11 +48,21 @@ defmodule FrameworkWeb.Router do
     get "/callbacks/:provider", OAuthCallbackController, :new
   end
 
-  scope "/aws", Web do
-    pipe_through :api
+  #  scope "/aws", Web do
+  #    pipe_through :api
+  #
+  #    get "/", ApiController, :list_objects
+  #    forward "/", ImagePlug, secret: &Framework.thumbor_secret/0
+  #  end
 
-    get "/", ApiController, :list_objects
-    forward "/", ImagePlug, secret: &Framework.thumbor_secret/0
+  scope "/image" do
+    forward "/", FrameworkWeb.ImagePlug,
+      secret: &FrameworkWeb.fetch_secret/0,
+      finch: Framework.Finch
+  end
+
+  scope "/ws", FrameworkWeb do
+    get "/connection_timer/:name", WebsocketUpgrade, FrameworkWeb.ConnectionTimer
   end
 
   # Other scopes may use custom stacks.

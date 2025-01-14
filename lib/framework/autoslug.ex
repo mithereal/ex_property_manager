@@ -1,5 +1,5 @@
 defmodule Framework.AutoSlug do
-  defmacro __using__(opts) do
+  defmacro __using__(_opts) do
     quote do
       def get_by_slug(slug) do
         Framework.Repo.get_by(__MODULE__, slug: slug)

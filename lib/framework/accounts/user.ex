@@ -172,7 +172,7 @@ defmodule Framework.Accounts.User do
     Bcrypt.verify_pass(password, hashed_password)
   end
 
-  def valid_password?(%Framework.Users.User{hashed_password: hashed_password}, password)
+  def valid_password?(%Framework.Users.User{hashed_password: hashed_password}, _password)
       when byte_size(hashed_password) < 1 do
     nil
   end

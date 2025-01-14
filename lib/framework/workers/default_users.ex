@@ -2,7 +2,9 @@ defmodule Framework.Workers.Setup.Users do
   use Oban.Worker, queue: "system", max_attempts: 5, unique: [period: 30]
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"name" => name, "email" => email, "password" => password} = args}) do
+  def perform(%Oban.Job{
+        args: %{"name" => name, "email" => email, "password" => password} = _args
+      }) do
     Framework.Accounts.setup_user(%{
       email: email,
       password: password,

@@ -33,7 +33,8 @@ config :framework, FrameworkWeb.Endpoint,
   watchers: [
     asset_copy: {Phoenix.Copy, :watch, [:framework]},
     esbuild: {Esbuild, :install_and_run, [:framework, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:framework, ~w(--watch)]}
+    tailwind: {Tailwind, :install_and_run, [:framework, ~w(--watch)]},
+    serviceworker: {Bun, :install_and_run, [:serviceworker, ~w(--sourcemap=inline --watch)]}
   ]
 
 # ## SSL Support
@@ -90,3 +91,5 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :framework, FrameworkWeb, secret_key: "abc"

@@ -72,7 +72,7 @@ defmodule FrameworkWeb.UserAuth do
   """
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
-    user_token && Accounts.delete_user_session_token(user_token)
+    user_token && Accounts.delete_session_token(user_token)
 
     if live_socket_id = get_session(conn, :live_socket_id) do
       FrameworkWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
@@ -214,7 +214,7 @@ defmodule FrameworkWeb.UserAuth do
   def require_authenticated_admin(conn, _opts) do
     user = conn.assigns[:current_user]
 
-    if user && LiveBeats.Accounts.admin?(user) do
+    if user && Framework.Accounts.admin?(user) do
       assign(conn, :current_admin, user)
     else
       conn

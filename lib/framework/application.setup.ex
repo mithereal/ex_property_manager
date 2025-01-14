@@ -8,6 +8,10 @@ defmodule Framework.Application.Setup do
     #    |> build_sitemap()
   end
 
+  def setup() do
+    :ok
+  end
+
   def build_sitemap(response) do
     state = %{id: "sitemap", schedule_in: 15}
     Framework.Workers.Sitemap.enqueue(state, :start)

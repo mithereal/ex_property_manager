@@ -2,7 +2,7 @@ defmodule Framework.Workers.Mailer.Password.Reset do
   use Oban.Worker, queue: "email", max_attempts: 5, unique: [period: 30]
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"name" => name, "email" => email} = args}) do
+  def perform(%Oban.Job{args: %{"name" => name, "email" => email} = _args}) do
     Framework.Mailer.Password.Reset.process(%{name: name, email: email})
   end
 

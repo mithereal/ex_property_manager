@@ -4,9 +4,6 @@ defmodule Framework.User.Server do
   #  use Membership.Behaviour, registry: :user_registry
   use GenServer
 
-  alias Framework.User.Server, as: SERVER
-
-  @name :user_server
   @public_registry_name :user_registry
 
   defstruct user: %{}
@@ -42,7 +39,8 @@ defmodule Framework.User.Server do
     GenServer.start_link(__MODULE__, [user], name: via_tuple(user.id))
   end
 
-  @impl true
+  true
+
   def init([user]) do
     initial_state = %__MODULE__{
       user: user
@@ -111,7 +109,7 @@ defmodule Framework.User.Server do
   def handle_call(
         {:update, data},
         _from,
-        state
+        _state
       ) do
     {:reply, {:ok, data}, data}
   end

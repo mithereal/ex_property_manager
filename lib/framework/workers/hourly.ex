@@ -2,7 +2,7 @@ defmodule Framework.Workers.Hourly do
   use Oban.Worker, queue: "system", max_attempts: 5, unique: [period: 30]
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"id" => id} = args}) do
+  def perform(%Oban.Job{args: %{"id" => _id} = _args}) do
     try do
       Framework.Application.Setup.setup()
       :ok

@@ -2,12 +2,12 @@ defmodule Framework.Workers.Settings do
   use Oban.Worker, queue: "system", max_attempts: 5, unique: [period: 30]
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"id" => id} = args}) do
+  def perform(%Oban.Job{args: %{"id" => _id} = _args}) do
     try do
       # Framework.System.Setup.run()
       :ok
     catch
-      x -> :error
+      _ -> :error
     end
   end
 
@@ -40,7 +40,6 @@ defmodule Framework.Workers.Settings do
   end
 
   def cancel(%Oban.Job{} = job) do
-    job
     Oban.cancel_job(Framework.Oban, job)
 
     # Server.shutdown(%{"id" => job.id})

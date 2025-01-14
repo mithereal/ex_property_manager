@@ -43,6 +43,7 @@ defmodule Framework.MixProject do
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:bun, "~> 1.3", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:heroicons,
        github: "tailwindlabs/heroicons",
@@ -79,7 +80,10 @@ defmodule Framework.MixProject do
       {:phoenix_seo, "~> 0.1.8"},
       {:phoenix_copy, ">= 0.0.0"},
       {:etag_plug, "~> 1.0"},
-      {:plug_cache_control, "~> 1.1.0", github: "tanguilp/plug_cache_control"}
+      {:plug_cache_control, "~> 1.1.0", github: "tanguilp/plug_cache_control"},
+      {:phoenix_bakery, "~> 0.1.0", runtime: false},
+      {:redirect, "~> 0.4.0"},
+      {:reverse_proxy_plug, "~> 3.0"}
     ]
   end
 
