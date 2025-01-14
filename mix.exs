@@ -91,7 +91,7 @@ defmodule Framework.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      diagram: ["cmd bash ../docker/generate_diagram.sh"],
+      diagram: ["cmd bash ./docker/generate_diagram.sh"],
       reset: ["deps.get", "ecto.drop", "ecto.setup", "assets.setup", "assets.build"],
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],

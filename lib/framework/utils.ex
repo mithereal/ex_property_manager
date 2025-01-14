@@ -18,12 +18,11 @@ defmodule Framework.Utils do
     today = Timex.now(tz) |> DateTime.to_date()
     tomorrow = today |> Timex.shift(days: 1)
 
-    reply =
-      case date do
-        date when date == today -> "Today"
-        date when date == tomorrow -> "Tomorrow"
-        _ -> to_string(date)
-      end
+    case date do
+      date when date == today -> "Today"
+      date when date == tomorrow -> "Tomorrow"
+      _ -> to_string(date)
+    end
   end
 
   def date_range_names(number_of_days, tz \\ "America/Phoenix") do

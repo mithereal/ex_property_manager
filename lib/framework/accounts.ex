@@ -661,4 +661,8 @@ defmodule Framework.Accounts do
         reply
     end
   end
+
+  def register_google_user(primary, info, emails, token) do
+    {primary, info, emails, token}
+  end
 end
