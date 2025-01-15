@@ -12,7 +12,7 @@ defmodule Framework.MediaLibrary do
     {:ok, _} = File.copy(tmp_path, image.filepath)
   end
 
-  defp delete_image_file(image) do
+  def delete_image_file(image) do
     case File.rm(image.filepath) do
       :ok ->
         :ok

@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :framework, :files, admin_usernames: []
+
 config :framework,
   ecto_repos: [Framework.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true],

@@ -3,11 +3,11 @@ defmodule FrameworkWeb.Router do
 
   import FrameworkWeb.UserAuth
 
-  import Redirect
-  import FrameworkWeb.Plugs
+  # import Redirect
+  # import FrameworkWeb.Plugs
 
   alias FrameworkWeb, as: Web
-  alias FrameworkWeb.Theme.Handler, as: ThemeHandler
+  # alias FrameworkWeb.Theme.Handler, as: ThemeHandler
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -36,10 +36,10 @@ defmodule FrameworkWeb.Router do
     get "/", PageController, :landing
   end
 
-  scope "/", Web do
+  scope "/.well-known", Web do
     pipe_through :webfinger
 
-    get "/.well-known/webfinger", FingerController, :finger
+    get "/webfinger", FingerController, :finger
   end
 
   scope "/oauth", Web do
@@ -65,10 +65,38 @@ defmodule FrameworkWeb.Router do
     get "/connection_timer/:name", WebsocketUpgrade, FrameworkWeb.ConnectionTimer
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", FrameworkWeb do
-  #   pipe_through :api
-  # end
+  scope "/", Web, log: false do
+    pipe_through [:robots]
+
+    get "/robots.txt", RobotController, :robots
+    get "/site.webmanifest", RobotController, :site_webmanifest
+    get "/browserconfig.xml", RobotController, :browserconfig
+  end
+
+  scope "/", Web do
+    pipe_through([:browser])
+    get("/login", UserSessionController, :new)
+    get("/logout", UserSessionController, :delete)
+    delete("/logout", UserSessionController, :delete)
+    post("/log_in", UserSessionController, :create)
+    post("/log_out", UserSessionController, :delete)
+    get("/force_logout", UserSessionController, :force_logout)
+    post("/force_logout", UserSessionController, :force_logout)
+    get("/reset_password", UserResetPasswordController, :new)
+    post("/reset_password", UserResetPasswordController, :create)
+    get("/reset_password/:token", UserResetPasswordController, :edit)
+    put("/reset_password/:token", UserResetPasswordController, :update)
+
+    delete "/signout", OAuthCallbackController, :sign_out
+  end
+
+  scope "/register", Web do
+    pipe_through([:browser])
+    #    pipe_through([:browser, :redirect_if_user_is_authenticated])
+
+    get("/", UserRegistrationController, :new)
+    post("/", UserRegistrationController, :create)
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:framework, :dev_routes) do

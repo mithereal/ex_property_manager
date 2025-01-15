@@ -1,9 +1,28 @@
 import Config
 
+config :framework, :files,
+  uploads_dir: Path.expand("../priv/uploads", __DIR__),
+  host: [scheme: "http", host: "localhost", port: 4000],
+  server_ip: "127.0.0.1",
+  hostname: "localhost",
+  transport_opts: []
+
 config :phoenix_copy,
-  framework: [
-    source: Path.expand("../assets/static/", __DIR__),
-    destination: Path.expand("../priv/static/", __DIR__)
+  css: [
+    source: Path.expand("../assets/static/css/", __DIR__),
+    destination: Path.expand("../priv/static/assets/", __DIR__)
+  ],
+  images: [
+    source: Path.expand("../assets/static/images/", __DIR__),
+    destination: Path.expand("../priv/static/images/", __DIR__)
+  ],
+  js: [
+    source: Path.expand("../assets/static/js/", __DIR__),
+    destination: Path.expand("../priv/static/assets/", __DIR__)
+  ],
+  fonts: [
+    source: Path.expand("../assets/static/fonts/", __DIR__),
+    destination: Path.expand("../priv/static/fonts/", __DIR__)
   ]
 
 # Configure your database
@@ -15,6 +34,14 @@ config :framework, Framework.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
+
+config :bun,
+  version: "1.1.42",
+  serviceworker: [
+    args: ~w(js/serviceworker.js --outdir=../priv/static/assets),
+    cd: Path.expand("../assets", __DIR__),
+    env: %{"ENV_VAR" => "value"}
+  ]
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -31,7 +58,10 @@ config :framework, FrameworkWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "tWtsjqdpRceYk4iSAM5NMjAEvFXQdldhf+2njEp6+0iAwXzJ5O+xpErYOBcrl3yr",
   watchers: [
-    asset_copy: {Phoenix.Copy, :watch, [:framework]},
+    asset_copy_css: {Phoenix.Copy, :watch, [:css]},
+    asset_copy_images: {Phoenix.Copy, :watch, [:images]},
+    asset_copy_js: {Phoenix.Copy, :watch, [:js]},
+    asset_copy_fonts: {Phoenix.Copy, :watch, [:fonts]},
     esbuild: {Esbuild, :install_and_run, [:framework, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:framework, ~w(--watch)]},
     serviceworker: {Bun, :install_and_run, [:serviceworker, ~w(--sourcemap=inline --watch)]}

@@ -5,6 +5,12 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
+
+config :framework, :files,
+  uploads_dir: Path.expand("../tmp/test-uploads", __DIR__),
+  host: [scheme: "http", host: "localhost", port: 4000],
+  server_ip: "127.0.0.1"
+
 config :framework, Framework.Repo,
   username: "postgres",
   password: "postgres",

@@ -6,6 +6,8 @@ defmodule Framework.Accounts.User do
   import Ecto.Changeset
 
   alias Framework.Repo
+  alias Framework.Accounts.User
+  alias Framework.Accounts.Identity
 
   @derive {
     Flop.Schema,
@@ -145,6 +147,7 @@ defmodule Framework.Accounts.User do
 
   @doc """
   A user changeset for changing the password.
+  A user changeset for changing the password.
   """
   def password_changeset(user, attrs) do
     user
@@ -205,5 +208,36 @@ defmodule Framework.Accounts.User do
   def update_user(hash, data) do
     Repo.get_by(Framework.Users.User, id: hash)
     |> Repo.update(data)
+  end
+
+  @doc """
+  A user changeset for github registration.
+  """
+  def github_registration_changeset(info, primary_email, emails, token) do
+    %{"login" => username, "avatar_url" => avatar_url, "html_url" => external_homepage_url} = info
+
+    identity_changeset =
+      Identity.github_registration_changeset(info, primary_email, emails, token)
+
+    if identity_changeset.valid? do
+      params = %{
+        "username" => username,
+        "email" => primary_email,
+        "name" => get_change(identity_changeset, :provider_name),
+        "avatar_url" => avatar_url,
+        "external_homepage_url" => external_homepage_url
+      }
+
+      %User{}
+      |> cast(params, [:email, :username])
+      |> validate_required([:email, :username])
+      |> validate_email()
+      |> put_assoc(:identities, [identity_changeset])
+    else
+      %User{}
+      |> change()
+      |> Map.put(:valid?, false)
+      |> put_assoc(:identities, [identity_changeset])
+    end
   end
 end

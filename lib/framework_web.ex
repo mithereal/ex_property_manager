@@ -33,11 +33,11 @@ defmodule FrameworkWeb do
     ~w(android-chrome-192x192.png android-chrome-512x512.png apple-touch-icon.png favicon.ico icon.svg site.webmanifest)
   end
 
-  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
+  def static_paths, do: ~w(assets fonts images svg favicon.ico robots.txt pwa.json)
 
   def router do
     quote do
-      use Phoenix.Router, helpers: false
+      use Phoenix.Router, helpers: true
 
       # Import common connection and controller functions to use in pipelines
       import Plug.Conn
@@ -71,6 +71,7 @@ defmodule FrameworkWeb do
         layout: {FrameworkWeb.Layouts, :app}
 
       unquote(html_helpers())
+      unquote(live_view_helpers())
     end
   end
 
@@ -125,5 +126,20 @@ defmodule FrameworkWeb do
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
+  end
+
+  defp live_view_helpers do
+    quote do
+      @impl true
+      def handle_info(%{event: "logout_user", payload: %{user: %{id: id}}}, socket) do
+        with %{id: ^id} <- socket.assigns.current_user do
+          {:noreply,
+           socket
+           |> redirect(to: url(~p"/force_logout"))}
+        else
+          _any -> {:noreply, socket}
+        end
+      end
+    end
   end
 end

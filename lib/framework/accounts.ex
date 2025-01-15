@@ -87,12 +87,13 @@ defmodule Framework.Accounts do
         default_password = Keyword.get(repo, :default_admin_password) || "admin"
 
         if default_username == user.username do
-          repo = Application.get_env(:framework, Framework.Repo)
+          changeset =
+            change_user_password(user, %{
+              password: default_password,
+              password_confirmation: default_password
+            })
 
-          change_user_password(user, %{
-            password: default_password,
-            password_confirmation: default_password
-          })
+          Repo.update(user, changeset)
 
           {:error, "Password Reset to Default"}
         else
@@ -161,8 +162,8 @@ defmodule Framework.Accounts do
     # |> grant_role("user")
   end
 
-  defp validate_passwords(_user) do
-  end
+  #  defp validate_passwords(_user) do
+  #  end
 
   #  defp grant_role(user, role) do
   #    role = Repo.get_by(Membership.Role, identifier: role)
@@ -189,9 +190,9 @@ defmodule Framework.Accounts do
   #    end
   #  end
 
-  defp maybe_grant(_user, _) do
-    {:ok, %{}}
-  end
+  #  defp maybe_grant(_user, _) do
+  #    {:ok, %{}}
+  #  end
 
   #  defp maybe_grant(user, role) do
   #    case user do
@@ -217,6 +218,10 @@ defmodule Framework.Accounts do
   #        Membership.load_and_store_member(user.member)
   #    end
   #  end
+
+  def setup_user(_) do
+    :ok
+  end
 
   @doc """
   Registers an admin.
@@ -666,7 +671,7 @@ defmodule Framework.Accounts do
     {primary, info, emails, token}
   end
 
-  def admin?(user) do
+  def admin?(_user) do
     false
   end
 end

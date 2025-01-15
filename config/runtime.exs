@@ -69,4 +69,12 @@ if config_env() == :prod do
   config :framework, FrameworkWeb,
     secret_key: System.fetch_env!("SECURITY_KEY"),
     cdn: ""
+
+  config :framework, :files,
+    admin_usernames: ~w(admin),
+    uploads_dir: Path.join(System.fetch_env!("BUCKET_MOUNT"), "/app/uploads"),
+    host: [scheme: "https", host: host, port: 443],
+    server_ip: System.get_env("SERVER_IP"),
+    hostname: "framework.local",
+    transport_opts: [inet6: true]
 end

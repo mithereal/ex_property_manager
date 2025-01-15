@@ -81,6 +81,14 @@ defmodule Framework.User.Server do
     {:noreply, state}
   end
 
+  def handle_cast(
+        :shutdown,
+        state
+      ) do
+    Task.async(fn -> Framework.Admin.refresh_users() end)
+    {:stop, :normal, state}
+  end
+
   def handle_call(
         :shutdown,
         _from,
@@ -88,14 +96,6 @@ defmodule Framework.User.Server do
       ) do
     Task.async(fn -> Framework.Admin.refresh_users() end)
     {:stop, :normal, state.user.id}
-  end
-
-  def handle_cast(
-        :shutdown,
-        state
-      ) do
-    Task.async(fn -> Framework.Admin.refresh_users() end)
-    {:stop, :normal, state}
   end
 
   def handle_call(

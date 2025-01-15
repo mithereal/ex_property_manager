@@ -2,9 +2,9 @@ defmodule Framework.Images.Image do
   use Ecto.Schema
   use Framework.AutoSlug
   import Ecto.Changeset
-  import Ecto.Query
+  #  import Ecto.Query
 
-  alias Framework.Images.Image
+  #  alias Framework.Images.Image
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
