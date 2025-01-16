@@ -10,7 +10,7 @@ defmodule Framework.Accounts.Identity do
   }
 
   # providers
-  @github "github"
+  @google "google"
 
   @derive {Inspect, except: [:provider_token, :provider_meta]}
   schema "identities" do
@@ -28,9 +28,9 @@ defmodule Framework.Accounts.Identity do
   end
 
   @doc """
-  A user changeset for github registration.
+  A user changeset for google registration.
   """
-  def github_registration_changeset(info, primary_email, emails, token) do
+  def google_registration_changeset(info, primary_email, emails, token) do
     params = %{
       "provider_token" => token,
       "provider_id" => to_string(info["id"]),
@@ -39,7 +39,7 @@ defmodule Framework.Accounts.Identity do
       "provider_email" => primary_email
     }
 
-    %Identity{provider: @github, provider_meta: %{"user" => info, "emails" => emails}}
+    %Identity{provider: @google, provider_meta: %{"user" => info, "emails" => emails}}
     |> cast(params, [
       :provider_token,
       :provider_email,

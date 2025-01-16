@@ -77,7 +77,7 @@ defmodule Framework.Accounts.User do
     |> validate_password()
   end
 
-  defp create_account(%{valid?: true} = changeset) do
+  def create_account(%{valid?: true} = changeset) do
     {:ok, account} =
       %Framework.Accounts.Account{email: changeset.changes.email} |> Framework.Repo.insert()
 
@@ -85,25 +85,25 @@ defmodule Framework.Accounts.User do
     |> put_change(:account_id, account.id)
   end
 
-  defp create_account(changeset) do
+  def create_account(changeset) do
     %{changeset | valid?: false}
   end
 
-  defp create_username(%{valid?: true} = changeset) do
+  def create_username(%{valid?: true} = changeset) do
     changeset
     |> put_change(:username, changeset.changes.email)
   end
 
-  defp create_username(changeset) do
+  def create_username(changeset) do
     changeset
   end
 
-  defp set_default_theme(%{valid?: true} = changeset) do
+  def set_default_theme(%{valid?: true} = changeset) do
     changeset
     |> put_change(:theme, "light")
   end
 
-  defp validate_email(changeset) do
+  def validate_email(changeset) do
     changeset
     |> validate_required([:email])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
@@ -112,7 +112,7 @@ defmodule Framework.Accounts.User do
     |> unique_constraint(:email)
   end
 
-  defp validate_password(changeset) do
+  def validate_password(changeset) do
     changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 5, max: 80)
@@ -122,7 +122,7 @@ defmodule Framework.Accounts.User do
     |> prepare_changes(&hash_password/1)
   end
 
-  defp hash_password(changeset) do
+  def hash_password(changeset) do
     password = get_change(changeset, :password)
 
     changeset
@@ -213,11 +213,11 @@ defmodule Framework.Accounts.User do
   @doc """
   A user changeset for github registration.
   """
-  def github_registration_changeset(info, primary_email, emails, token) do
+  def google_registration_changeset(info, primary_email, emails, token) do
     %{"login" => username, "avatar_url" => avatar_url, "html_url" => external_homepage_url} = info
 
     identity_changeset =
-      Identity.github_registration_changeset(info, primary_email, emails, token)
+      Identity.google_registration_changeset(info, primary_email, emails, token)
 
     if identity_changeset.valid? do
       params = %{
@@ -239,5 +239,11 @@ defmodule Framework.Accounts.User do
       |> Map.put(:valid?, false)
       |> put_assoc(:identities, [identity_changeset])
     end
+  end
+
+  def settings_changeset(%User{} = user, params) do
+    user
+    |> cast(params, [:username])
+    |> validate_required([:username])
   end
 end

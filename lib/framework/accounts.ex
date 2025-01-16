@@ -5,9 +5,11 @@ defmodule Framework.Accounts do
 
   # use Terminator.UUID
 
+  import Ecto.Changeset, warn: false
   import Ecto.Query, warn: false
   alias Framework.Repo
   alias Framework.Accounts.User
+  alias Framework.Accounts.Identity
   alias Framework.Accounts.UserToken
   alias Framework.Mailer
 
@@ -162,9 +164,6 @@ defmodule Framework.Accounts do
     # |> grant_role("user")
   end
 
-  #  defp validate_passwords(_user) do
-  #  end
-
   #  defp grant_role(user, role) do
   #    role = Repo.get_by(Membership.Role, identifier: role)
   #
@@ -218,10 +217,6 @@ defmodule Framework.Accounts do
   #        Membership.load_and_store_member(user.member)
   #    end
   #  end
-
-  def setup_user(_) do
-    :ok
-  end
 
   @doc """
   Registers an admin.
@@ -667,11 +662,77 @@ defmodule Framework.Accounts do
     end
   end
 
-  def register_google_user(primary, info, emails, token) do
-    {primary, info, emails, token}
+  def admin?(%User{} = user) do
+    user.email in Framework.config([:admin_emails])
   end
 
-  def admin?(_user) do
-    false
+  ## User registration
+
+  @doc """
+  Registers a user from their GithHub information.
+  """
+  def register_google_user(primary_email, info, emails, token) do
+    if user = get_user_by_provider(:google, primary_email) do
+      update_google_token(user, token)
+    else
+      info
+      |> User.google_registration_changeset(primary_email, emails, token)
+      |> Repo.insert()
+    end
+  end
+
+  def get_user_by_provider(provider, email) when provider in [:github] do
+    query =
+      from(u in User,
+        join: i in assoc(u, :identities),
+        where:
+          i.provider == ^to_string(provider) and
+            fragment("lower(?)", u.email) == ^String.downcase(email)
+      )
+
+    Repo.one(query)
+  end
+
+  def change_settings(%User{} = user, attrs) do
+    User.settings_changeset(user, attrs)
+  end
+
+  defp update_google_token(%User{} = user, new_token) do
+    identity =
+      Repo.one!(from(i in Identity, where: i.user_id == ^user.id and i.provider == "google"))
+
+    {:ok, _} =
+      identity
+      |> change()
+      |> put_change(:provider_token, new_token)
+      |> Repo.update()
+
+    {:ok, Repo.preload(user, :identities, force: true)}
+  end
+
+  def list_users(opts) do
+    Repo.all(from u in User, limit: ^Keyword.fetch!(opts, :limit))
+  end
+
+  def get_users_map(user_ids) when is_list(user_ids) do
+    Repo.all(from u in User, where: u.id in ^user_ids, select: {u.id, u})
+  end
+
+  def list_active_users(id, opts) do
+    Repo.all(
+      from u in User,
+        where: u.id == ^id,
+        where: u.active == true,
+        limit: ^Keyword.fetch!(opts, :limit)
+    )
+  end
+
+  @doc """
+  Updates a user settings.
+  """
+  def update_settings(%User{} = user, attrs) do
+    user
+    |> change_settings(attrs)
+    |> Repo.update()
   end
 end

@@ -60,7 +60,7 @@ defmodule Framework.Accounts.UserToken do
     build_hashed_token(user, context, user.email)
   end
 
-  defp build_hashed_token(user, context, sent_to) do
+  def build_hashed_token(user, context, sent_to) do
     token = :crypto.strong_rand_bytes(@rand_size)
     hashed_token = :crypto.hash(@hash_algorithm, token)
 
@@ -97,8 +97,8 @@ defmodule Framework.Accounts.UserToken do
     end
   end
 
-  defp days_for_context("confirm"), do: @confirm_validity_in_days
-  defp days_for_context("reset_password"), do: @reset_password_validity_in_days
+  def days_for_context("confirm"), do: @confirm_validity_in_days
+  def days_for_context("reset_password"), do: @reset_password_validity_in_days
 
   @doc """
   Checks if the token is valid and returns its underlying lookup query.

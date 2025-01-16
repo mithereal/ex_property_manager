@@ -130,6 +130,8 @@ defmodule FrameworkWeb do
 
   defp live_view_helpers do
     quote do
+      import FrameworkWeb.UserAuth, only: [signed_in_path: 1]
+
       @impl true
       def handle_info(%{event: "logout_user", payload: %{user: %{id: id}}}, socket) do
         with %{id: ^id} <- socket.assigns.current_user do

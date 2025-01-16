@@ -33,6 +33,12 @@ defmodule FrameworkWeb.Router do
   scope "/", Web do
     pipe_through :browser
 
+    get "/", RedirectController, :redirect_authenticated
+  end
+
+  scope "/home", Web do
+    pipe_through [:browser, :require_authenticated_user]
+
     get "/", PageController, :landing
   end
 
@@ -73,14 +79,12 @@ defmodule FrameworkWeb.Router do
     get "/browserconfig.xml", RobotController, :browserconfig
   end
 
+  # Login/Logout routes
   scope "/", Web do
     pipe_through([:browser])
     get("/login", UserSessionController, :new)
-    get("/logout", UserSessionController, :delete)
-    delete("/logout", UserSessionController, :delete)
     post("/log_in", UserSessionController, :create)
-    post("/log_out", UserSessionController, :delete)
-    get("/force_logout", UserSessionController, :force_logout)
+    delete("/log_out", UserSessionController, :delete)
     post("/force_logout", UserSessionController, :force_logout)
     get("/reset_password", UserResetPasswordController, :new)
     post("/reset_password", UserResetPasswordController, :create)
@@ -88,11 +92,14 @@ defmodule FrameworkWeb.Router do
     put("/reset_password/:token", UserResetPasswordController, :update)
 
     delete "/signout", OAuthCallbackController, :sign_out
+
+    #    live_session :default, on_mount: [{UserAuth, :current_user}] do
+    #      live "/login", SignInLive, :index
+    #    end
   end
 
   scope "/register", Web do
-    pipe_through([:browser])
-    #    pipe_through([:browser, :redirect_if_user_is_authenticated])
+    pipe_through([:browser, :redirect_if_user_is_authenticated])
 
     get("/", UserRegistrationController, :new)
     post("/", UserRegistrationController, :create)

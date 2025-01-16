@@ -5,7 +5,7 @@ defmodule Framework.Workers.Setup.Users do
   def perform(%Oban.Job{
         args: %{"name" => name, "email" => email, "password" => password} = _args
       }) do
-    Framework.Accounts.setup_user(%{
+    Framework.Accounts.register_user(%{
       email: email,
       password: password,
       password_confirmation: password,

@@ -8,6 +8,7 @@ defmodule Framework.Users.User do
   alias Framework.Repo
 
   alias Framework.Users.User
+  alias Framework.Accounts.Identity
 
   @derive {
     Flop.Schema,
@@ -51,17 +52,18 @@ defmodule Framework.Users.User do
       :active,
       :password,
       :password_confirmation,
-      :terms,
       :confirmed_at,
       :last_login,
       :username
     ])
     |> validate_email()
     |> validate_password()
-    |> validate_required(:terms, message: "Do You Accept The Terms")
     |> validate_required([:password_confirmation])
     |> validate_confirmation(:password, message: "Passwords dont match")
     |> create_username()
+    |> create_account()
+
+    #    |> create_member()
   end
 
   def changeset(schema, attrs) do
@@ -69,18 +71,17 @@ defmodule Framework.Users.User do
     |> cast(attrs, [
       :email,
       :password,
+      :account,
       :username,
-      :terms,
-      :stripe_account_id,
-      :account_id,
-      :profile_id,
-      :membership_id
+      :active,
+      :last_login,
+      :confirmed_at
     ])
     |> validate_email()
     |> validate_password()
   end
 
-  defp create_account(%{valid?: true} = changeset) do
+  def create_account(%{valid?: true} = changeset) do
     {:ok, account} =
       %Framework.Accounts.Account{email: changeset.changes.email} |> Framework.Repo.insert()
 
@@ -88,20 +89,25 @@ defmodule Framework.Users.User do
     |> put_change(:account_id, account.id)
   end
 
-  defp create_account(changeset) do
+  def create_account(changeset) do
     %{changeset | valid?: false}
   end
 
-  defp create_username(%{valid?: true} = changeset) do
+  def create_username(%{valid?: true} = changeset) do
     changeset
     |> put_change(:username, changeset.changes.email)
   end
 
-  defp create_username(changeset) do
+  def create_username(changeset) do
     changeset
   end
 
-  defp validate_email(changeset) do
+  def set_default_theme(%{valid?: true} = changeset) do
+    changeset
+    |> put_change(:theme, "light")
+  end
+
+  def validate_email(changeset) do
     changeset
     |> validate_required([:email])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
@@ -110,7 +116,7 @@ defmodule Framework.Users.User do
     |> unique_constraint(:email)
   end
 
-  defp validate_password(changeset) do
+  def validate_password(changeset) do
     changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 5, max: 80)
@@ -120,7 +126,7 @@ defmodule Framework.Users.User do
     |> prepare_changes(&hash_password/1)
   end
 
-  defp hash_password(changeset) do
+  def hash_password(changeset) do
     password = get_change(changeset, :password)
 
     changeset
@@ -145,6 +151,7 @@ defmodule Framework.Users.User do
 
   @doc """
   A user changeset for changing the password.
+  A user changeset for changing the password.
   """
   def password_changeset(user, attrs) do
     user
@@ -167,12 +174,12 @@ defmodule Framework.Users.User do
   If there is no user or the user doesn't have a password, we call
   `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%User{hashed_password: hashed_password}, password)
+  def valid_password?(%Framework.Users.User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Bcrypt.verify_pass(password, hashed_password)
   end
 
-  def valid_password?(%User{hashed_password: hashed_password}, _password)
+  def valid_password?(%Framework.Users.User{hashed_password: hashed_password}, _password)
       when byte_size(hashed_password) < 1 do
     nil
   end
@@ -193,29 +200,54 @@ defmodule Framework.Users.User do
     end
   end
 
-  def get_user(email) do
-    Repo.get_by(User, email: email)
+  def get_user(hash) do
+    Repo.get_by(Framework.Users.User, id: hash)
     |> Repo.preload(:profile)
   end
 
   def update_user(data) do
-    Repo.update(User, data)
+    Repo.update(Framework.Users.User, data)
   end
 
-  def delete_user(user) do
-    Repo.delete(User, user)
-  end
-
-  def delete_user_by_email(email) do
-    Repo.delete(User, email)
-  end
-
-  def update_user(id, data) do
-    Repo.get_by(User, id: id)
+  def update_user(hash, data) do
+    Repo.get_by(Framework.Users.User, id: hash)
     |> Repo.update(data)
   end
 
-  def delete_all_users do
-    # the logic for deleting all the accounts ...
+  @doc """
+  A user changeset for github registration.
+  """
+  def google_registration_changeset(info, primary_email, emails, token) do
+    %{"login" => username, "avatar_url" => avatar_url, "html_url" => external_homepage_url} = info
+
+    identity_changeset =
+      Identity.google_registration_changeset(info, primary_email, emails, token)
+
+    if identity_changeset.valid? do
+      params = %{
+        "username" => username,
+        "email" => primary_email,
+        "name" => get_change(identity_changeset, :provider_name),
+        "avatar_url" => avatar_url,
+        "external_homepage_url" => external_homepage_url
+      }
+
+      %User{}
+      |> cast(params, [:email, :username])
+      |> validate_required([:email, :username])
+      |> validate_email()
+      |> put_assoc(:identities, [identity_changeset])
+    else
+      %User{}
+      |> change()
+      |> Map.put(:valid?, false)
+      |> put_assoc(:identities, [identity_changeset])
+    end
+  end
+
+  def settings_changeset(%User{} = user, params) do
+    user
+    |> cast(params, [:username])
+    |> validate_required([:username])
   end
 end
